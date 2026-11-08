@@ -1,7 +1,7 @@
 cabal-version:      2.4
-name:               sistema-gestao-avaliacoes
+name:               loja-online-stock
 version:            0.1.0.0
-synopsis:           Sistema de Gestao de Alunos e Avaliacoes em Haskell
+synopsis:           Sistema de Loja Online e Gestao de Stock em Haskell
 description:        Trabalho Pratico Semestral de Programacao Funcional (Fase 1).
 author:             Grupo de Programacao Funcional
 category:           Education
@@ -16,19 +16,19 @@ library
     build-depends:    base >= 4.14 && < 5.0
     ghc-options:      -Wall
 
-executable sistema-gestao-avaliacoes
+executable loja-online-stock
     main-is:          Main.hs
     hs-source-dirs:   app
     default-language: Haskell2010
     build-depends:    base >= 4.14 && < 5.0
-                    , sistema-gestao-avaliacoes
+                    , loja-online-stock
     ghc-options:      -Wall
 
-test-suite sistema-test
+test-suite loja-test
     type:             exitcode-stdio-1.0
     main-is:          Spec.hs
     hs-source-dirs:   test
     default-language: Haskell2010
     build-depends:    base >= 4.14 && < 5.0
-                    , sistema-gestao-avaliacoes
+                    , loja-online-stock
     ghc-options:      -Wall

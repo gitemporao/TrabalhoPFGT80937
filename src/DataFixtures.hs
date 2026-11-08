@@ -2,32 +2,35 @@ module DataFixtures where
 
 import Model
 
--- Alguns alunos para teste
-listaAlunos :: [Aluno]
-listaAlunos =
-    [ Aluno 50001 "Joao Silva" "LEI"
-    , Aluno 50002 "Maria Santos" "LEI"
-    , Aluno 50003 "Pedro Ferreira" "LCD"
+-- Produtos em catalogo para teste
+produtosExemplo :: [Produto]
+produtosExemplo =
+    [ Produto 101 "Rato Sem Fios" Informatica 25.0 15
+    , Produto 102 "Teclado Mecanico" Informatica 80.0 5
+    , Produto 103 "Camisola Algodao" Roupa 30.0 2
+    , Produto 104 "Livro Haskell Basico" Livros 22.5 12
+    , Produto 105 "Candeeiro Secretaria" Casa 35.0 1
     ]
 
--- Algumas UCs
-listaUCs :: [UnidadeCurricular]
-listaUCs =
-    [ UnidadeCurricular "PF" "Programacao Funcional" 6
-    , UnidadeCurricular "AED" "Algoritmos e Estruturas de Dados" 6
-    ]
+-- Encomendas de exemplo
+encomenda1 :: Encomenda
+encomenda1 = Encomenda
+    { encId      = 1
+    , encCliente = "Joao Silva"
+    , encItens   = [ ItemEncomenda 101 2   -- 2 * 25.0 = 50.0
+                   , ItemEncomenda 102 1   -- 1 * 80.0 = 80.0 -> Total: 130.0
+                   ]
+    , encEstado  = Pendente
+    }
 
--- Avaliacoes de exemplo
-listaAvaliacoes :: [Avaliacao]
-listaAvaliacoes =
-    [ -- Notas do Joao a PF (media ponderada: 14*0.4 + 16*0.6 = 5.6 + 9.6 = 15.2)
-      Avaliacao 50001 "PF" Trabalho 0.40 14.0
-    , Avaliacao 50001 "PF" Exame 0.60 16.0
+encomenda2 :: Encomenda
+encomenda2 = Encomenda
+    { encId      = 2
+    , encCliente = "Maria Santos"
+    , encItens   = [ ItemEncomenda 104 2   -- 2 * 22.5 = 45.0
+                   ]
+    , encEstado  = Paga
+    }
 
-      -- Notas da Maria a PF (media: 8*0.4 + 9*0.6 = 3.2 + 5.4 = 8.6 -> Reprovada)
-    , Avaliacao 50002 "PF" Trabalho 0.40 8.0
-    , Avaliacao 50002 "PF" Exame 0.60 9.0
-
-      -- Notas do Pedro a AED
-    , Avaliacao 50003 "AED" Teste 1.00 17.5
-    ]
+encomendasExemplo :: [Encomenda]
+encomendasExemplo = [encomenda1, encomenda2]

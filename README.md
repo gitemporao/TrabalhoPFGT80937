@@ -1,71 +1,103 @@
 # Trabalho Pratico de Programacao Funcional - Fase 1
 
-Sistema de Gestao de Alunos e Notas desenvolvido em Haskell para a unidade curricular de Programacao Funcional.
+## Tema: Sistema de Loja Online e Gestao de Stock
+Aplicacao desenvolvida em Haskell para gestao de produtos, inventario/stock e processamento de encomendas.
 
-## Elementos do Grupo
-- Nome: [O Teu Nome] (Numero: [O Teu Numero])
-- Nome: [Nome Colega] (Numero: [Numero Colega])
+---
 
-## O que foi feito nesta Fase 1
-Nesta primeira fase implementamos as bases do sistema com tipos de dados proprios e funcoes puras com recursao e pattern matching:
+## 1. Identificacao do Grupo
+- **Aluno 1:** [O Teu Nome] ([O Teu Numero])
+- **Aluno 2:** [Nome Colega] ([Numero Colega])
 
-1. **Modelos de dados (`src/Model.hs`):**
-   - Tipos com `data` e records para `Aluno`, `UnidadeCurricular` e `Avaliacao`.
-   - Tipo de dados para o tipo de prova (`Teste`, `Trabalho`, `Exame`).
-   - Sinonimos de tipos (`NumeroAluno`, `CodigoUC`, `Nota`).
+---
 
-2. **Logica e funcoes funcionais (`src/Domain.hs`):**
-   - Insercao e pesquisa recursiva de alunos (`adicionarAluno`, `procurarAluno`).
-   - Filtragem de alunos por curso com recursao (`filtrarPorCurso`).
-   - Calculo de media ponderada de avaliacoes usando uma funcao auxiliar recursiva (`calcularMediaUC`).
-   - Verificacao de aproveitamento a uma disciplina (`alunoAprovado`).
-   - Determinacao da nota mais alta de uma lista (`maiorNota`).
-   - Uso de `Maybe` para tratar casos onde o elemento nao existe ou nao ha notas.
+## 2. Descricao do Problema e Ambito
+O objetivo desta aplicacao e fornecer um nucleo funcional puro para:
+- Gerir o catalogo de produtos e niveis de stock em armazem;
+- Controlar artigos com rutura ou stock baixo;
+- Processar encomendas de clientes, calculando valores totais e aplicacao de campanhas de desconto;
+- Garantir a integridade dos dados atraves do sistema de tipos estatico do Haskell.
 
-3. **Dados de exemplo (`src/DataFixtures.hs`):**
-   - Lista com alunos, UCs e notas de exemplo para demonstracao.
+---
 
-4. **Demonstracao e Testes:**
-   - `app/Main.hs`: Corre exemplos no ecra com os dados de teste.
-   - `test/Spec.hs`: Testes simples para confirmar que as funcoes devolvem os valores esperados.
+## 3. Modelação e Conceitos Funcionais Aplicados (Fase 1)
 
-## Estrutura das pastas
+### Modelação de Dados (`src/Model.hs`)
+- **Tipos de dados algebricos (`data`):**
+  - `Categoria`: `Informatica | Roupa | Livros | Casa`
+  - `EstadoEncomenda`: `Pendente | Paga | Enviada`
+- **Registos (Records):**
+  - `Produto`: Identificador unico (`ProdutoId`), nome, categoria, preco e quantidade disponivel em stock.
+  - `ItemEncomenda`: Par composto pelo ID do produto e respetiva quantidade pedida.
+  - `Encomenda`: Identificador da encomenda, nome do cliente, lista de itens encomendados e estado da encomenda.
+- **Sinonimos de Tipos (`type`):**
+  - `type ProdutoId = Int`, `type Preco = Double`, `type Quantidade = Int`, etc.
+
+### Núcleo Funcional e Recursão (`src/Domain.hs`)
+Todas as operacoes da Fase 1 foram implementadas atraves de funcoes puras, com assinaturas de tipo explicitas e recursao estrutural:
+- `adicionarProduto`: Adicao com atualizacao automatica se o ID ja existir;
+- `procurarProduto`: Pesquisa recursiva protegida com `Maybe` (evita falhas de execucao caso nao exista);
+- `produtosPorCategoria`: Filtragem recursiva de artigos por categoria;
+- `produtosStockBaixo`: Detecao recursiva de produtos com quantidade inferior ou igual a um limite de seguranca;
+- `atualizarStock`: Atualizacao da quantidade em armazem garantindo que nao fica negativo;
+- `totalEncomenda`: Calculo acumulado do valor dos itens de uma encomenda atraves de recursao;
+- `aplicarDesconto`: Regra de negocio simples de aplicacao de percentagem de desconto para valores superiores a 100 EUR;
+- `produtoMaisCaro`: Determinacao recursiva do elemento maximo do inventario.
+
+---
+
+## 4. Estrutura do Projeto
+
 ```text
-.
+PF/
 ├── src/
-│   ├── Model.hs         -- tipos e dados
-│   ├── Domain.hs        -- funcoes puras e recursao
-│   └── DataFixtures.hs  -- dados de teste
+│   ├── Model.hs               -- Definicao dos tipos de dados e registos
+│   ├── Domain.hs              -- Nucleo funcional puro e funcoes recursivas
+│   └── DataFixtures.hs        -- Dados estaticos de exemplo para testes
 ├── app/
-│   └── Main.hs          -- programa principal de teste
+│   └── Main.hs                -- Programa principal de demonstracao no terminal
 ├── test/
-│   └── Spec.hs          -- testes
-├── cabal.project
-├── sistema-gestao-avaliacoes.cabal
-└── README.md
+│   └── Spec.hs                -- Testes unitarios simples com verificacao de resultados
+├── loja-online-stock.cabal    -- Configuracao do pacote Cabal
+├── cabal.project              -- Projeto Cabal
+├── README.md                  -- Documentacao da Fase 1
+└── .gitignore                 -- Ficheiros temporarios ignorados
 ```
 
-## Como executar
+---
 
-### Com Cabal:
-Executar a demonstracao:
+## 5. Como Compilar e Executar
+
+### Utilizando o Cabal
+Para compilar e correr o programa de demonstracao:
 ```bash
 cabal run
 ```
 
-Executar os testes:
+Para correr os testes da aplicacao:
 ```bash
 cabal test
 ```
 
-### Com GHCi:
+### Utilizando o GHCi (Terminal Interativo)
 ```bash
 ghci src/Model.hs src/Domain.hs src/DataFixtures.hs
 ```
-Exemplos de testes no GHCi:
+
+Exemplos de testes interativos:
 ```haskell
-totalAlunos listaAlunos
-procurarAluno 50001 listaAlunos
-calcularMediaUC 50001 "PF" listaAvaliacoes
-alunoAprovado 50001 "PF" listaAvaliacoes
+-- Ver total de produtos
+totalProdutos produtosExemplo
+
+-- Procurar um produto
+procurarProduto 101 produtosExemplo
+
+-- Ver produtos com stock critico (<= 2 unidades)
+produtosStockBaixo 2 produtosExemplo
+
+-- Ver custo da encomenda 1
+totalEncomenda encomenda1 produtosExemplo
+
+-- Ver o produto mais caro
+produtoMaisCaro produtosExemplo
 ```

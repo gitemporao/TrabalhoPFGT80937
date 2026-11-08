@@ -6,31 +6,33 @@ import DataFixtures
 
 main :: IO ()
 main = do
-    putStrLn "=== Trabalho Pratico de PF - Fase 1 ==="
-    putStrLn "Sistema de Gestao de Alunos e Notas"
+    putStrLn "=== Sistema de Loja Online e Gestao de Stock (Fase 1) ==="
     putStrLn ""
 
-    putStrLn "1. Total de alunos registados:"
-    print (totalAlunos listaAlunos)
+    putStrLn "1. Total de tipos de produtos registados:"
+    print (totalProdutos produtosExemplo)
 
-    putStrLn "\n2. Procurar aluno com numero 50001:"
-    print (procurarAluno 50001 listaAlunos)
+    putStrLn "\n2. Procurar produto com ID 102:"
+    print (procurarProduto 102 produtosExemplo)
 
-    putStrLn "\n3. Procurar aluno inexistente (numero 99999):"
-    print (procurarAluno 99999 listaAlunos)
+    putStrLn "\n3. Procurar produto inexistente (ID 999):"
+    print (procurarProduto 999 produtosExemplo)
 
-    putStrLn "\n4. Alunos do curso LEI:"
-    print (filtrarPorCurso "LEI" listaAlunos)
+    putStrLn "\n4. Produtos da categoria Informatica:"
+    print (produtosPorCategoria Informatica produtosExemplo)
 
-    putStrLn "\n5. Media do Joao Silva (50001) a PF:"
-    let mediaJoao = calcularMediaUC 50001 "PF" listaAvaliacoes
-    print mediaJoao
+    putStrLn "\n5. Produtos com stock baixo (<= 3 unidades):"
+    print (produtosStockBaixo 3 produtosExemplo)
 
-    putStrLn "\n6. O Joao passou a PF?"
-    print (alunoAprovado 50001 "PF" listaAvaliacoes)
+    putStrLn "\n6. Calculo do total da Encomenda 1 (Joao Silva):"
+    let totalEnc1 = totalEncomenda encomenda1 produtosExemplo
+    putStrLn ("Total normal: " ++ show totalEnc1 ++ " EUR")
+    let totalComDesconto = aplicarDesconto 10.0 totalEnc1
+    putStrLn ("Total com 10% de desconto (>100 EUR): " ++ show totalComDesconto ++ " EUR")
 
-    putStrLn "\n7. A Maria passou a PF?"
-    print (alunoAprovado 50002 "PF" listaAvaliacoes)
+    putStrLn "\n7. Calculo do total da Encomenda 2 (Maria Santos):"
+    let totalEnc2 = totalEncomenda encomenda2 produtosExemplo
+    putStrLn ("Total normal: " ++ show totalEnc2 ++ " EUR")
 
-    putStrLn "\n8. Maior nota entre [12.0, 17.5, 9.0]:"
-    print (maiorNota [12.0, 17.5, 9.0])
+    putStrLn "\n8. Produto mais caro do catalogo:"
+    print (produtoMaisCaro produtosExemplo)

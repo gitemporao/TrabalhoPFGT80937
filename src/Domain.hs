@@ -2,76 +2,88 @@ module Domain where
 
 import Model
 
--- Adiciona um aluno a lista. Se o numero ja existir, atualiza os dados
-adicionarAluno :: Aluno -> [Aluno] -> [Aluno]
-adicionarAluno novo [] = [novo]
-adicionarAluno novo (a:resto)
-    | numero novo == numero a = novo : resto
-    | otherwise               = a : adicionarAluno novo resto
+-- ============================================================================
+-- Gestao de Produtos e Stock (Funcoes Puras e Recursao)
+-- ============================================================================
 
--- Procura um aluno pelo seu numero
-procurarAluno :: NumeroAluno -> [Aluno] -> Maybe Aluno
-procurarAluno _ [] = Nothing
-procurarAluno numProcurado (a:resto)
-    | numero a == numProcurado = Just a
-    | otherwise                = procurarAluno numProcurado resto
+-- Adiciona um produto ao inventario. Se ja existir com esse ID, atualiza os dados
+adicionarProduto :: Produto -> [Produto] -> [Produto]
+adicionarProduto novo [] = [novo]
+adicionarProduto novo (p:resto)
+    | prodId novo == prodId p = novo : resto
+    | otherwise               = p : adicionarProduto novo resto
 
--- Filtra os alunos que pertencem a determinado curso
-filtrarPorCurso :: String -> [Aluno] -> [Aluno]
-filtrarPorCurso _ [] = []
-filtrarPorCurso cursoDesejado (a:resto)
-    | curso a == cursoDesejado = a : filtrarPorCurso cursoDesejado resto
-    | otherwise                = filtrarPorCurso cursoDesejado resto
+-- Procura um produto pelo seu ID usando Maybe para caso nao exista
+procurarProduto :: ProdutoId -> [Produto] -> Maybe Produto
+procurarProduto _ [] = Nothing
+procurarProduto targetId (p:resto)
+    | prodId p == targetId = Just p
+    | otherwise            = procurarProduto targetId resto
 
--- Conta quantos alunos existem na lista
-totalAlunos :: [Aluno] -> Int
-totalAlunos [] = 0
-totalAlunos (_:resto) = 1 + totalAlunos resto
+-- Filtra os produtos de uma determinada categoria
+produtosPorCategoria :: Categoria -> [Produto] -> [Produto]
+produtosPorCategoria _ [] = []
+produtosPorCategoria cat (p:resto)
+    | prodCategoria p == cat = p : produtosPorCategoria cat resto
+    | otherwise              = produtosPorCategoria cat resto
 
--- Procura uma UC pelo seu codigo (ex: "PF")
-procurarUC :: CodigoUC -> [UnidadeCurricular] -> Maybe UnidadeCurricular
-procurarUC _ [] = Nothing
-procurarUC codProcurado (u:resto)
-    | codigo u == codProcurado = Just u
-    | otherwise                = procurarUC codProcurado resto
+-- Lista de produtos que estao com stock em rutura ou baixo (<= limite)
+produtosStockBaixo :: Quantidade -> [Produto] -> [Produto]
+produtosStockBaixo _ [] = []
+produtosStockBaixo limite (p:resto)
+    | prodStock p <= limite = p : produtosStockBaixo limite resto
+    | otherwise             = produtosStockBaixo limite resto
 
--- Retorna apenas as avaliacoes de um aluno numa certa UC
-avaliacoesDoAlunoNaUC :: NumeroAluno -> CodigoUC -> [Avaliacao] -> [Avaliacao]
-avaliacoesDoAlunoNaUC _ _ [] = []
-avaliacoesDoAlunoNaUC num cod (av:resto)
-    | numAluno av == num && codUC av == cod = av : avaliacoesDoAlunoNaUC num cod resto
-    | otherwise                             = avaliacoesDoAlunoNaUC num cod resto
+-- Conta recursivamente o numero total de produtos registados
+totalProdutos :: [Produto] -> Int
+totalProdutos [] = 0
+totalProdutos (_:resto) = 1 + totalProdutos resto
 
--- Funcao auxiliar recursiva para calcular:
--- soma das notas ponderadas (nota * peso) e soma dos pesos
-somarNotasEPesos :: [Avaliacao] -> (Double, Double)
-somarNotasEPesos [] = (0.0, 0.0)
-somarNotasEPesos (av:resto) =
-    let (somaNotasResto, somaPesosResto) = somarNotasEPesos resto
-        pontos = nota av * peso av
-    in (pontos + somaNotasResto, peso av + somaPesosResto)
+-- Atualiza a quantidade em stock de um produto
+atualizarStock :: ProdutoId -> Quantidade -> [Produto] -> [Produto]
+atualizarStock _ _ [] = []
+atualizarStock pid delta (p:resto)
+    | prodId p == pid =
+        let novoStock = if prodStock p + delta < 0 then 0 else prodStock p + delta
+        in p { prodStock = novoStock } : resto
+    | otherwise = p : atualizarStock pid delta resto
 
--- Calcula a media final de um aluno a uma UC
--- Devolve Nothing se nao houver avaliacoes registadas
-calcularMediaUC :: NumeroAluno -> CodigoUC -> [Avaliacao] -> Maybe Nota
-calcularMediaUC num cod listaAvals =
-    let avalsAluno = avaliacoesDoAlunoNaUC num cod listaAvals
-    in case somarNotasEPesos avalsAluno of
-        (_, 0.0) -> Nothing
-        (totalPontos, totalPesos) -> Just (totalPontos / totalPesos)
 
--- Verifica se um aluno teve aproveitamento (nota final >= 9.5)
-alunoAprovado :: NumeroAluno -> CodigoUC -> [Avaliacao] -> Maybe Bool
-alunoAprovado num cod listaAvals =
-    case calcularMediaUC num cod listaAvals of
-        Nothing    -> Nothing
-        Just media -> Just (media >= 9.5)
+-- ============================================================================
+-- Calculos de Encomendas e Totais
+-- ============================================================================
 
--- Encontra a nota mais alta de uma lista de notas
-maiorNota :: [Nota] -> Maybe Nota
-maiorNota [] = Nothing
-maiorNota [x] = Just x
-maiorNota (x:xs) =
-    case maiorNota xs of
-        Nothing -> Just x
-        Just m  -> Just (if x > m then x else m)
+-- Calcula o valor de um item (preco * quantidade). Devolve 0.0 se nao encontrar o produto
+valorItem :: ItemEncomenda -> [Produto] -> Double
+valorItem item prods =
+    case procurarProduto (itemProdId item) prods of
+        Just p  -> prodPreco p * fromIntegral (itemQtd item)
+        Nothing -> 0.0
+
+-- Calcula o valor total de uma lista de itens recursivamente
+calcularTotalItens :: [ItemEncomenda] -> [Produto] -> Double
+calcularTotalItens [] _ = 0.0
+calcularTotalItens (item:resto) prods =
+    valorItem item prods + calcularTotalItens resto prods
+
+-- Calcula o custo total de uma encomenda
+totalEncomenda :: Encomenda -> [Produto] -> Double
+totalEncomenda enc prods = calcularTotalItens (encItens enc) prods
+
+-- Aplica um desconto caso o total atinja um valor minimo (ex: 10% se total > 100)
+aplicarDesconto :: Double -> Double -> Double
+aplicarDesconto percentagem total
+    | total >= 100.0 = total - (total * (percentagem / 100.0))
+    | otherwise      = total
+
+-- Encontra recursivamente o produto mais caro de uma lista
+produtoMaisCaro :: [Produto] -> Maybe Produto
+produtoMaisCaro [] = Nothing
+produtoMaisCaro [p] = Just p
+produtoMaisCaro (p:resto) =
+    case produtoMaisCaro resto of
+        Nothing -> Just p
+        Just outro ->
+            if prodPreco p > prodPreco outro
+                then Just p
+                else Just outro
