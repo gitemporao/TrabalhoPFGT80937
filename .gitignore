@@ -7,3 +7,5 @@ dist-newstyle/
 *.exe
 .DS_Store
 Thumbs.db
+.vs/
+
