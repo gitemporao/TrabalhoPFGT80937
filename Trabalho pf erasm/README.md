@@ -6,8 +6,8 @@ Aplicacao desenvolvida em Haskell para gestao de produtos, inventario/stock e pr
 ---
 
 ## 1. Identificacao do Grupo
-- **Aluno 1:** [O Teu Nome] ([O Teu Numero])
-- **Aluno 2:** [Nome Colega] ([Numero Colega])
+
+Guilherme Temporao Al80937
 
 ---
 
