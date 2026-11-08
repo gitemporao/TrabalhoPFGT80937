@@ -6,8 +6,8 @@ Aplicacao desenvolvida em Haskell para gestao de produtos, inventario/stock e pr
 ---
 
 ## 1. Identificacao do Grupo
-
-Guilherme Temporao Al80937
+- **Aluno:** Guilherme Temporao (Al80937)
+- **Repositorio GitHub:** [https://github.com/gitemporao/TrabalhoPFGT80937](https://github.com/gitemporao/TrabalhoPFGT80937)
 
 ---
 
