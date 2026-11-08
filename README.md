@@ -1,113 +1,71 @@
-# Sistema de Gestão de Alunos e Avaliações
-**Unidade Curricular:** Programação Funcional  
-**Fase 1:** Modelação e Núcleo Funcional  
-**Linguagem:** Haskell  
+# Trabalho Pratico de Programacao Funcional - Fase 1
 
----
+Sistema de Gestao de Alunos e Notas desenvolvido em Haskell para a unidade curricular de Programacao Funcional.
 
-## 1. Descrição do Projeto
+## Elementos do Grupo
+- Nome: [O Teu Nome] (Numero: [O Teu Numero])
+- Nome: [Nome Colega] (Numero: [Numero Colega])
 
-O **Sistema de Gestão de Alunos e Avaliações** é uma aplicação em Haskell para modelar e gerir o percurso académico dos alunos, as suas unidades curriculares e as respetivas avaliações/classificações.
+## O que foi feito nesta Fase 1
+Nesta primeira fase implementamos as bases do sistema com tipos de dados proprios e funcoes puras com recursao e pattern matching:
 
-Nesta **Fase 1**, o projeto foca-se estritamente nos alicerces fundamentais da programação funcional:
-1. **Modelação de Domínio:** Definição rigorosa de tipos algébricos (`data`), sinónimos de tipos (`type`) e registos (*records*).
-2. **Núcleo Funcional Puro:** Implementação de operações essenciais através de **funções puras**, **pattern matching** e **recursão estrutural explícita**.
-3. **Ausência / Tratamento Inicial de Casos Limite:** Utilização segura de `Maybe` para pesquisas e cálculos onde os dados possam não existir.
-4. **Conjunto de Dados de Teste:** Fixtures estáticas com alunos, UCs e avaliações para validação e testes unitários.
+1. **Modelos de dados (`src/Model.hs`):**
+   - Tipos com `data` e records para `Aluno`, `UnidadeCurricular` e `Avaliacao`.
+   - Tipo de dados para o tipo de prova (`Teste`, `Trabalho`, `Exame`).
+   - Sinonimos de tipos (`NumeroAluno`, `CodigoUC`, `Nota`).
 
----
+2. **Logica e funcoes funcionais (`src/Domain.hs`):**
+   - Insercao e pesquisa recursiva de alunos (`adicionarAluno`, `procurarAluno`).
+   - Filtragem de alunos por curso com recursao (`filtrarPorCurso`).
+   - Calculo de media ponderada de avaliacoes usando uma funcao auxiliar recursiva (`calcularMediaUC`).
+   - Verificacao de aproveitamento a uma disciplina (`alunoAprovado`).
+   - Determinacao da nota mais alta de uma lista (`maiorNota`).
+   - Uso de `Maybe` para tratar casos onde o elemento nao existe ou nao ha notas.
 
-## 2. Estrutura do Projeto
+3. **Dados de exemplo (`src/DataFixtures.hs`):**
+   - Lista com alunos, UCs e notas de exemplo para demonstracao.
 
-O projeto segue a estrutura padrão recomendada no enunciado:
+4. **Demonstracao e Testes:**
+   - `app/Main.hs`: Corre exemplos no ecra com os dados de teste.
+   - `test/Spec.hs`: Testes simples para confirmar que as funcoes devolvem os valores esperados.
 
+## Estrutura das pastas
 ```text
-PF/
-├── cabal.project                      # Configuração do Cabal
-├── sistema-gestao-avaliacoes.cabal    # Especificação do pacote, biblioteca, executável e testes
-├── README.md                          # Este ficheiro descritivo
-├── .gitignore                         # Ficheiros ignorados pelo Git
+.
 ├── src/
-│   ├── Model.hs                       # Definição dos tipos do domínio (Aluno, UC, Avaliacao, etc.)
-│   ├── Domain.hs                      # Lógica pura, recursão e regras de cálculo
-│   └── DataFixtures.hs                # Dados de teste para demonstração imediata
+│   ├── Model.hs         -- tipos e dados
+│   ├── Domain.hs        -- funcoes puras e recursao
+│   └── DataFixtures.hs  -- dados de teste
 ├── app/
-│   └── Main.hs                        # Executável de demonstração da Fase 1
+│   └── Main.hs          -- programa principal de teste
 ├── test/
-│   └── Spec.hs                        # Testes unitários das funções puras
-├── data/                              # Pasta para ficheiros de dados externos (Fases 2 e 3)
-└── docs/                              # Documentação e relatórios
+│   └── Spec.hs          -- testes
+├── cabal.project
+├── sistema-gestao-avaliacoes.cabal
+└── README.md
 ```
 
----
+## Como executar
 
-## 3. Conceitos Funcionais Aplicados na Fase 1
-
-### Modelação (`src/Model.hs`)
-* **Tipos Algébricos Próprios (`data`):**
-  * `TipoAvaliacao`: `Teste | TrabalhoPratico | Exame | MiniTeste`
-  * `UnidadeCurricular`: Registo com código, nome e ECTS.
-  * `Aluno`: Registo com número de estudante (`AlunoId`), nome, e-mail e curso.
-  * `Avaliacao`: Registo que associa um aluno a uma UC, peso percentual e nota (0.0 a 20.0).
-  * `Sistema`: Estado global agregador.
-
-### Funções Puras e Recursão (`src/Domain.hs`)
-Todas as funções possuem assinaturas de tipo explícitas e funcionam de forma imutável:
-* `inserirAluno :: Aluno -> [Aluno] -> [Aluno]` — inserção com substituição recursiva se o ID já existir;
-* `buscarAlunoPorId :: AlunoId -> [Aluno] -> Maybe Aluno` — pesquisa recursiva com tratamento de ausência (`Maybe`);
-* `alunosPorCurso :: String -> [Aluno] -> [Aluno]` — filtragem recursiva por curso;
-* `contarAlunos :: [Aluno] -> Int` — contagem recursiva elementar de elementos;
-* `avaliacoesAlunoUC :: AlunoId -> UCEId -> [Avaliacao] -> [Avaliacao]` — extração recursiva de avaliações de um aluno numa dada UC;
-* `somaPonderadaRecursiva :: [Avaliacao] -> (Double, Double)` — cálculo recursivo do somatório de pesos e pontos;
-* `calcularNotaFinalUC :: AlunoId -> UCEId -> [Avaliacao] -> Maybe Nota` — cálculo da média final com verificação de divisão por zero;
-* `estaAprovadoUC :: AlunoId -> UCEId -> [Avaliacao] -> Maybe Bool` — verificação de aprovação ($\ge 9.5$);
-* `notaMaxima`, `notaMinima :: [Nota] -> Maybe Nota` — determinação recursiva de extremos.
-
----
-
-## 4. Como Compilar e Executar
-
-### Opção A: Com o Cabal (Recomendado)
-Para compilar e correr o executável de demonstração:
+### Com Cabal:
+Executar a demonstracao:
 ```bash
 cabal run
 ```
 
-Para correr a suite de testes:
+Executar os testes:
 ```bash
 cabal test
 ```
 
-### Opção B: Com o GHCi (Interativo)
-Caso queira testar diretamente no terminal interativo:
+### Com GHCi:
 ```bash
-cd src
-ghci Model.hs Domain.hs DataFixtures.hs
+ghci src/Model.hs src/Domain.hs src/DataFixtures.hs
 ```
-Exemplos de chamadas interativas no GHCi:
+Exemplos de testes no GHCi:
 ```haskell
--- Contar alunos
-contarAlunos alunosExemplo
-
--- Pesquisar aluno
-buscarAlunoPorId 202301 alunosExemplo
-
--- Nota final da aluna Ana Silva (202301) em PF
-calcularNotaFinalUC 202301 "PF" avaliacoesExemplo
-
--- Verificar aprovação
-estaAprovadoUC 202301 "PF" avaliacoesExemplo
+totalAlunos listaAlunos
+procurarAluno 50001 listaAlunos
+calcularMediaUC 50001 "PF" listaAvaliacoes
+alunoAprovado 50001 "PF" listaAvaliacoes
 ```
-
-### Opção C: Compilação Manual com GHC
-```bash
-ghc -i./src app/Main.hs -o sistema.exe
-./sistema.exe
-```
-
----
-
-## 5. Identificação da Equipa
-* **Elemento 1:** [Nome do Aluno] ([Número])
-* **Elemento 2:** [Nome do Aluno] ([Número])
-* **Elemento 3:** [Nome do Aluno] ([Número])

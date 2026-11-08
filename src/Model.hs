@@ -1,53 +1,37 @@
 module Model where
 
--- | Identificador único de aluno (número mecanográfico)
-type AlunoId = Int
+-- Tipos basicos com sinonimos para facilitar a leitura
+type NumeroAluno = Int
+type Nome        = String
+type CodigoUC    = String
+type Nota        = Double
 
--- | Nome do aluno ou da disciplina
-type Nome = String
-
--- | Código de Unidade Curricular (ex: "PF", "AED")
-type UCEId = String
-
--- | Nota de avaliação (0 a 20)
-type Nota = Double
-
--- | Tipo de momento de avaliação
+-- Tipos de avaliacao possiveis numa disciplina
 data TipoAvaliacao
     = Teste
-    | TrabalhoPratico
+    | Trabalho
     | Exame
-    | MiniTeste
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq)
 
--- | Representação de uma Unidade Curricular
-data UnidadeCurricular = UnidadeCurricular
-    { ucCodigo :: UCEId
-    , ucNome   :: Nome
-    , ucEcts   :: Int
-    } deriving (Show, Eq, Read)
-
--- | Representação de um Aluno
+-- Estrutura de um aluno
 data Aluno = Aluno
-    { alunoId    :: AlunoId
-    , alunoNome  :: Nome
-    , alunoEmail :: String
-    , alunoCurso :: String
-    } deriving (Show, Eq, Read)
+    { numero :: NumeroAluno
+    , nome   :: Nome
+    , curso  :: String
+    } deriving (Show, Eq)
 
--- | Registo individual de uma Avaliação de um Aluno numa UC
+-- Estrutura de uma Unidade Curricular
+data UnidadeCurricular = UnidadeCurricular
+    { codigo :: CodigoUC
+    , designacao :: Nome
+    , ects   :: Int
+    } deriving (Show, Eq)
+
+-- Registo de uma avaliacao individual
 data Avaliacao = Avaliacao
-    { avalAlunoId :: AlunoId
-    , avalUCCod   :: UCEId
-    , avalTipo    :: TipoAvaliacao
-    , avalDesc    :: String
-    , avalPeso    :: Double    -- Percentagem/ponderação (ex: 0.40 para 40%)
-    , avalNota    :: Nota      -- Nota obtida (0.0 a 20.0)
-    } deriving (Show, Eq, Read)
-
--- | Estado global do sistema agregando todas as entidades
-data Sistema = Sistema
-    { sistemaAlunos :: [Aluno]
-    , sistemaUCs    :: [UnidadeCurricular]
-    , sistemaAvals  :: [Avaliacao]
+    { numAluno :: NumeroAluno
+    , codUC    :: CodigoUC
+    , tipo     :: TipoAvaliacao
+    , peso     :: Double   -- ex: 0.4 para 40%
+    , nota     :: Nota     -- nota de 0 a 20
     } deriving (Show, Eq)

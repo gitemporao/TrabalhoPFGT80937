@@ -2,46 +2,32 @@ module DataFixtures where
 
 import Model
 
--- | Conjunto de dados de teste para Alunos
-alunosExemplo :: [Aluno]
-alunosExemplo =
-    [ Aluno 202301 "Ana Silva" "ana.silva@universidade.pt" "Engenharia Informatica"
-    , Aluno 202302 "Bruno Santos" "bruno.santos@universidade.pt" "Engenharia Informatica"
-    , Aluno 202303 "Carla Mendes" "carla.mendes@universidade.pt" "Ciencia de Dados"
-    , Aluno 202304 "Diogo Costa" "diogo.costa@universidade.pt" "Engenharia Informatica"
+-- Alguns alunos para teste
+listaAlunos :: [Aluno]
+listaAlunos =
+    [ Aluno 50001 "Joao Silva" "LEI"
+    , Aluno 50002 "Maria Santos" "LEI"
+    , Aluno 50003 "Pedro Ferreira" "LCD"
     ]
 
--- | Conjunto de dados de teste para Unidades Curriculares
-ucsExemplo :: [UnidadeCurricular]
-ucsExemplo =
+-- Algumas UCs
+listaUCs :: [UnidadeCurricular]
+listaUCs =
     [ UnidadeCurricular "PF" "Programacao Funcional" 6
     , UnidadeCurricular "AED" "Algoritmos e Estruturas de Dados" 6
-    , UnidadeCurricular "BD" "Bases de Dados" 6
     ]
 
--- | Conjunto de dados de teste para Avaliações
-avaliacoesExemplo :: [Avaliacao]
-avaliacoesExemplo =
-    [ -- Ana Silva (202301) em PF
-      Avaliacao 202301 "PF" MiniTeste "Mini-teste 1" 0.20 16.5
-    , Avaliacao 202301 "PF" TrabalhoPratico "Trabalho Fase 1" 0.40 17.0
-    , Avaliacao 202301 "PF" Exame "Exame Final" 0.40 15.0
+-- Avaliacoes de exemplo
+listaAvaliacoes :: [Avaliacao]
+listaAvaliacoes =
+    [ -- Notas do Joao a PF (media ponderada: 14*0.4 + 16*0.6 = 5.6 + 9.6 = 15.2)
+      Avaliacao 50001 "PF" Trabalho 0.40 14.0
+    , Avaliacao 50001 "PF" Exame 0.60 16.0
 
-      -- Bruno Santos (202302) em PF
-    , Avaliacao 202302 "PF" MiniTeste "Mini-teste 1" 0.20 8.0
-    , Avaliacao 202302 "PF" TrabalhoPratico "Trabalho Fase 1" 0.40 9.0
-    , Avaliacao 202302 "PF" Exame "Exame Final" 0.40 8.5
+      -- Notas da Maria a PF (media: 8*0.4 + 9*0.6 = 3.2 + 5.4 = 8.6 -> Reprovada)
+    , Avaliacao 50002 "PF" Trabalho 0.40 8.0
+    , Avaliacao 50002 "PF" Exame 0.60 9.0
 
-      -- Carla Mendes (202303) em PF e AED
-    , Avaliacao 202303 "PF" TrabalhoPratico "Trabalho Fase 1" 0.50 18.0
-    , Avaliacao 202303 "PF" Exame "Exame Final" 0.50 19.0
-    , Avaliacao 202303 "AED" Teste "Teste 1" 1.00 14.5
+      -- Notas do Pedro a AED
+    , Avaliacao 50003 "AED" Teste 1.00 17.5
     ]
-
--- | Estado inicial completo com os dados de exemplo
-sistemaExemplo :: Sistema
-sistemaExemplo = Sistema
-    { sistemaAlunos = alunosExemplo
-    , sistemaUCs    = ucsExemplo
-    , sistemaAvals  = avaliacoesExemplo
-    }

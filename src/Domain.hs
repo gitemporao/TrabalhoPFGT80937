@@ -2,123 +2,76 @@ module Domain where
 
 import Model
 
--- ============================================================================
--- Funções de Gestão de Alunos (Recursão e Pattern Matching)
--- ============================================================================
+-- Adiciona um aluno a lista. Se o numero ja existir, atualiza os dados
+adicionarAluno :: Aluno -> [Aluno] -> [Aluno]
+adicionarAluno novo [] = [novo]
+adicionarAluno novo (a:resto)
+    | numero novo == numero a = novo : resto
+    | otherwise               = a : adicionarAluno novo resto
 
--- | Inserir um aluno na lista (evita duplicados pelo alunoId)
-inserirAluno :: Aluno -> [Aluno] -> [Aluno]
-inserirAluno novo [] = [novo]
-inserirAluno novo (a:as)
-    | alunoId novo == alunoId a = novo : as  -- Atualiza se já existir
-    | otherwise                 = a : inserirAluno novo as
+-- Procura um aluno pelo seu numero
+procurarAluno :: NumeroAluno -> [Aluno] -> Maybe Aluno
+procurarAluno _ [] = Nothing
+procurarAluno numProcurado (a:resto)
+    | numero a == numProcurado = Just a
+    | otherwise                = procurarAluno numProcurado resto
 
--- | Procurar aluno por ID recursivamente
-buscarAlunoPorId :: AlunoId -> [Aluno] -> Maybe Aluno
-buscarAlunoPorId _ [] = Nothing
-buscarAlunoPorId targetId (a:as)
-    | alunoId a == targetId = Just a
-    | otherwise             = buscarAlunoPorId targetId as
+-- Filtra os alunos que pertencem a determinado curso
+filtrarPorCurso :: String -> [Aluno] -> [Aluno]
+filtrarPorCurso _ [] = []
+filtrarPorCurso cursoDesejado (a:resto)
+    | curso a == cursoDesejado = a : filtrarPorCurso cursoDesejado resto
+    | otherwise                = filtrarPorCurso cursoDesejado resto
 
--- | Filtrar alunos pertencentes a um curso específico (recursão pura)
-alunosPorCurso :: String -> [Aluno] -> [Aluno]
-alunosPorCurso _ [] = []
-alunosPorCurso cursoAlvo (a:as)
-    | alunoCurso a == cursoAlvo = a : alunosPorCurso cursoAlvo as
-    | otherwise                 = alunosPorCurso cursoAlvo as
+-- Conta quantos alunos existem na lista
+totalAlunos :: [Aluno] -> Int
+totalAlunos [] = 0
+totalAlunos (_:resto) = 1 + totalAlunos resto
 
--- | Contar número total de alunos recursivamente
-contarAlunos :: [Aluno] -> Int
-contarAlunos [] = 0
-contarAlunos (_:as) = 1 + contarAlunos as
+-- Procura uma UC pelo seu codigo (ex: "PF")
+procurarUC :: CodigoUC -> [UnidadeCurricular] -> Maybe UnidadeCurricular
+procurarUC _ [] = Nothing
+procurarUC codProcurado (u:resto)
+    | codigo u == codProcurado = Just u
+    | otherwise                = procurarUC codProcurado resto
 
+-- Retorna apenas as avaliacoes de um aluno numa certa UC
+avaliacoesDoAlunoNaUC :: NumeroAluno -> CodigoUC -> [Avaliacao] -> [Avaliacao]
+avaliacoesDoAlunoNaUC _ _ [] = []
+avaliacoesDoAlunoNaUC num cod (av:resto)
+    | numAluno av == num && codUC av == cod = av : avaliacoesDoAlunoNaUC num cod resto
+    | otherwise                             = avaliacoesDoAlunoNaUC num cod resto
 
--- ============================================================================
--- Funções de Gestão de Unidades Curriculares
--- ============================================================================
+-- Funcao auxiliar recursiva para calcular:
+-- soma das notas ponderadas (nota * peso) e soma dos pesos
+somarNotasEPesos :: [Avaliacao] -> (Double, Double)
+somarNotasEPesos [] = (0.0, 0.0)
+somarNotasEPesos (av:resto) =
+    let (somaNotasResto, somaPesosResto) = somarNotasEPesos resto
+        pontos = nota av * peso av
+    in (pontos + somaNotasResto, peso av + somaPesosResto)
 
--- | Inserir UC na lista de UCs
-inserirUC :: UnidadeCurricular -> [UnidadeCurricular] -> [UnidadeCurricular]
-inserirUC nova [] = [nova]
-inserirUC nova (u:us)
-    | ucCodigo nova == ucCodigo u = nova : us
-    | otherwise                   = u : inserirUC nova us
-
--- | Buscar UC por código
-buscarUCPorCod :: UCEId -> [UnidadeCurricular] -> Maybe UnidadeCurricular
-buscarUCPorCod _ [] = Nothing
-buscarUCPorCod cod (u:us)
-    | ucCodigo u == cod = Just u
-    | otherwise         = buscarUCPorCod cod us
-
-
--- ============================================================================
--- Funções de Gestão e Análise de Avaliações (Cálculo e Recursão)
--- ============================================================================
-
--- | Registar uma nova avaliação
-registarAvaliacao :: Avaliacao -> [Avaliacao] -> [Avaliacao]
-registarAvaliacao nova avals = nova : avals
-
--- | Obter todas as avaliações de um aluno numa UC específica
-avaliacoesAlunoUC :: AlunoId -> UCEId -> [Avaliacao] -> [Avaliacao]
-avaliacoesAlunoUC _ _ [] = []
-avaliacoesAlunoUC aid cod (av:avs)
-    | avalAlunoId av == aid && avalUCCod av == cod = av : avaliacoesAlunoUC aid cod avs
-    | otherwise                                   = avaliacoesAlunoUC aid cod avs
-
--- | Obter todas as avaliações de um aluno (em todas as disciplinas)
-avaliacoesAluno :: AlunoId -> [Avaliacao] -> [Avaliacao]
-avaliacoesAluno _ [] = []
-avaliacoesAluno aid (av:avs)
-    | avalAlunoId av == aid = av : avaliacoesAluno aid avs
-    | otherwise             = avaliacoesAluno aid avs
-
--- | Calcular soma ponderada (nota * peso) e soma dos pesos recursivamente
--- Retorna (somaPonderada, somaPesos)
-somaPonderadaRecursiva :: [Avaliacao] -> (Double, Double)
-somaPonderadaRecursiva [] = (0.0, 0.0)
-somaPonderadaRecursiva (av:avs) =
-    let (restoPontos, restoPesos) = somaPonderadaRecursiva avs
-        pontos = avalNota av * avalPeso av
-        pesos  = avalPeso av
-    in (pontos + restoPontos, pesos + restoPesos)
-
--- | Calcular a média final de um aluno numa dada UC
--- Se não tiver avaliações ou a soma de pesos for 0, retorna Nothing
-calcularNotaFinalUC :: AlunoId -> UCEId -> [Avaliacao] -> Maybe Nota
-calcularNotaFinalUC aid cod avals =
-    let avalsAluno = avaliacoesAlunoUC aid cod avals
-    in case somaPonderadaRecursiva avalsAluno of
+-- Calcula a media final de um aluno a uma UC
+-- Devolve Nothing se nao houver avaliacoes registadas
+calcularMediaUC :: NumeroAluno -> CodigoUC -> [Avaliacao] -> Maybe Nota
+calcularMediaUC num cod listaAvals =
+    let avalsAluno = avaliacoesDoAlunoNaUC num cod listaAvals
+    in case somarNotasEPesos avalsAluno of
         (_, 0.0) -> Nothing
-        (pontos, pesos) -> Just (pontos / pesos)
+        (totalPontos, totalPesos) -> Just (totalPontos / totalPesos)
 
--- | Determinar se o aluno está aprovado numa UC (Nota >= 9.5)
-estaAprovadoUC :: AlunoId -> UCEId -> [Avaliacao] -> Maybe Bool
-estaAprovadoUC aid cod avals =
-    case calcularNotaFinalUC aid cod avals of
-        Nothing   -> Nothing
-        Just nota -> Just (nota >= 9.5)
+-- Verifica se um aluno teve aproveitamento (nota final >= 9.5)
+alunoAprovado :: NumeroAluno -> CodigoUC -> [Avaliacao] -> Maybe Bool
+alunoAprovado num cod listaAvals =
+    case calcularMediaUC num cod listaAvals of
+        Nothing    -> Nothing
+        Just media -> Just (media >= 9.5)
 
--- | Listar notas de todas as avaliações de um aluno
-extrairNotas :: [Avaliacao] -> [Nota]
-extrairNotas [] = []
-extrairNotas (av:avs) = avalNota av : extrairNotas avs
-
--- | Encontrar a nota máxima recursivamente
-notaMaxima :: [Nota] -> Maybe Nota
-notaMaxima [] = Nothing
-notaMaxima [x] = Just x
-notaMaxima (x:xs) =
-    case notaMaxima xs of
+-- Encontra a nota mais alta de uma lista de notas
+maiorNota :: [Nota] -> Maybe Nota
+maiorNota [] = Nothing
+maiorNota [x] = Just x
+maiorNota (x:xs) =
+    case maiorNota xs of
         Nothing -> Just x
         Just m  -> Just (if x > m then x else m)
-
--- | Encontrar a nota mínima recursivamente
-notaMinima :: [Nota] -> Maybe Nota
-notaMinima [] = Nothing
-notaMinima [x] = Just x
-notaMinima (x:xs) =
-    case notaMinima xs of
-        Nothing -> Just x
-        Just m  -> Just (if x < m then x else m)
